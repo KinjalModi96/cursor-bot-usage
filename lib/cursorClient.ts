@@ -17,11 +17,26 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+function normalizeSessionToken(raw: string): string {
+  let token = raw.trim();
+  if (
+    (token.startsWith('"') && token.endsWith('"')) ||
+    (token.startsWith("'") && token.endsWith("'"))
+  ) {
+    token = token.slice(1, -1).trim();
+  }
+  const prefix = "WorkosCursorSessionToken=";
+  if (token.toLowerCase().startsWith(prefix.toLowerCase())) {
+    token = token.slice(prefix.length).trim();
+  }
+  return token;
+}
+
 export function cursorCookie(): string | null {
   const token = process.env.CURSOR_SESSION_TOKEN?.trim();
   if (!token) return null;
-  if (token.includes("=")) return token;
-  return `WorkosCursorSessionToken=${token}`;
+  if (token.includes("=") && !token.startsWith("user_")) return token;
+  return `WorkosCursorSessionToken=${normalizeSessionToken(token)}`;
 }
 
 export function requireCursorCookie(): string {

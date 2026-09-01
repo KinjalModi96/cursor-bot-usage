@@ -11,7 +11,8 @@
     "capture": "tsx scripts/capture.ts",
     "publish-screenshot": "tsx scripts/publishScreenshot.ts",
     "report": "tsx scripts/sendReport.ts",
-    "daily-report": "tsx scripts/capture.ts && tsx scripts/sendReport.ts"
+    "daily-report": "tsx scripts/capture.ts && tsx scripts/sendReport.ts",
+    "sync-token": "tsx scripts/syncCursorToken.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.0",

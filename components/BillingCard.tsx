@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { CalendarRange, Crown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,14 +12,23 @@ interface BillingCardProps {
   membershipType: string;
 }
 
-export function BillingCard({ start, end, membershipType }: BillingCardProps) {
-  const now = Date.now();
+function billingProgress(start: string, end: string, now: number) {
   const s = new Date(start).getTime();
   const e = new Date(end).getTime();
   const total = Math.max(1, e - s);
   const elapsed = Math.max(0, Math.min(total, now - s));
-  const pct = (elapsed / total) * 100;
-  const daysLeft = Math.max(0, Math.ceil((e - now) / 86_400_000));
+  return {
+    pct: (elapsed / total) * 100,
+    daysLeft: Math.max(0, Math.ceil((e - now) / 86_400_000)),
+  };
+}
+
+export function BillingCard({ start, end, membershipType }: BillingCardProps) {
+  const [progress, setProgress] = useState({ pct: 0, daysLeft: 0 });
+
+  useEffect(() => {
+    setProgress(billingProgress(start, end, Date.now()));
+  }, [start, end]);
 
   return (
     <Card>
@@ -37,12 +49,12 @@ export function BillingCard({ start, end, membershipType }: BillingCardProps) {
         <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-secondary/70">
           <div
             className="h-full rounded-full bg-gradient-accent transition-[width] duration-1000"
-            style={{ width: `${pct}%` }}
+            style={{ width: `${progress.pct}%` }}
           />
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          {daysLeft} day{daysLeft === 1 ? "" : "s"} remaining · {pct.toFixed(0)}% of
-          cycle elapsed
+          {progress.daysLeft} day{progress.daysLeft === 1 ? "" : "s"} remaining ·{" "}
+          {progress.pct.toFixed(0)}% of cycle elapsed
         </p>
       </CardContent>
     </Card>
